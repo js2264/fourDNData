@@ -1,0 +1,39 @@
+Package: fourDNData
+Title: 4DN data package
+Version: 1.1.6
+Date: 2022-08-16
+Authors@R: 
+    person(given = "Jacques",
+           family = "Serizay",
+           role = c("aut", "cre"),
+           email = "jacquesserizay@gmail.com")
+Description: 
+    fourDNData is a data package giving programmatic access to Hi-C 
+    contact matrices uniformly processed by the 
+    [4DN consortium](https://www.4dnucleome.org/). The matrices are available 
+    in the multi-resolution `.mcool` format. 
+License: MIT + file LICENSE
+URL: https://github.com/js2264/fourDNData
+BugReports: https://github.com/js2264/fourDNData/issues
+Depends:
+    ExperimentHub,
+    R (>= 2.10)
+Imports: 
+    BiocFileCache, 
+    AnnotationHub
+Suggests:
+    HiCExperiment, 
+    testthat, 
+    methods,
+    BiocStyle,
+    knitr, 
+    rmarkdown
+biocViews: 
+    ExperimentHub,
+    ExperimentData, 
+    SequencingData
+Encoding: UTF-8
+VignetteBuilder: knitr
+LazyData: false
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.2

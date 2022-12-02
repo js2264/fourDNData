@@ -1,0 +1,68 @@
+---
+title: "fourDNData"
+author: "Jacques Serizay"
+date: "`r Sys.Date()`"
+output: 
+    BiocStyle::html_document
+vignette: >
+    %\VignetteIndexEntry{fourDNData}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r, eval = TRUE, echo=FALSE, results="hide", message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+suppressPackageStartupMessages({
+    library(fourDNData)
+})
+```
+
+## Introduction to fourDNData 
+
+fourDNData is a data package giving programmatic access to Hi-C 
+contact matrices uniformly processed by the 
+[4DN consortium](https://www.4dnucleome.org/). The matrices are available 
+in the multi-resolution `.mcool` format, using the 
+`fourDNData(ID = ...)` function. 
+
+```{r}
+library(fourDNData)
+```
+
+The `fourDNData()` function provides a gateway to ExperimentHub-hosted 4DN 
+`.mcool` files.
+
+```{r}
+data(fourDNDataFiles)
+head(fourDNDataFiles)
+cool_file <- fourDNData(id = '4DNFIJTOIGOI')
+cool_file
+```
+
+## HiCExperiment and fourDNData
+
+`HiCExperiment` package can be used to import `.mcool` files provided by 
+`fourDNData`. Refer to `HiCExperiment` package documentation for further 
+information. 
+
+```{r}
+library(HiCExperiment)
+ID <- '4DNFIJTOIGOI'
+coolf <- CoolFile(
+    path = fourDNData(id = ID), 
+    metadata = as.list(fourDNDataFiles[fourDNDataFiles$ID == ID,])
+)
+x <- import(coolf, resolution = 250000, focus = 'chr5:10000000-50000000')
+x
+interactions(x)
+as(x, 'ContactMatrix')
+```
+
+## Session info
+
+```{r}
+sessionInfo()
+```
