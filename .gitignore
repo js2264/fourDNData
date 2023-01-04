@@ -10,3 +10,4 @@ inst/extdata/metadata_2022*
 .Rdata
 .httr-oauth
 .DS_Store
+*pdf

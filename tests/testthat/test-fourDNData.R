@@ -1,8 +1,8 @@
-context("test-fourDNData")
+context("test-fourDNDataFiles")
 
-test_that("fourDNData function works", {
+test_that("fourDNDataFiles function works", {
     expect_equal({
-        s <- fourDNData(id = "4DNFIJTOIGOI")
+        s <- fourDNDataFiles(id = "4DNFIJTOIGOI")
         isTRUE(nzchar(s, keepNA = TRUE))
     }, TRUE)
 })

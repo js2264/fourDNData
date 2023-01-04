@@ -20,10 +20,10 @@ suppressPackageStartupMessages({
 })
 ```
 
-## Introduction to fourDNData 
+## Access to 4DN data
 
-fourDNData is a data package giving programmatic access to Hi-C 
-contact matrices uniformly processed by the 
+fourDNData (read *4DN-Data*) is a data package giving programmatic access 
+to Hi-C contact matrices uniformly processed by the 
 [4DN consortium](https://www.4dnucleome.org/). The matrices are available 
 in the multi-resolution `.mcool` format, using the 
 `fourDNData(ID = ...)` function. 
