@@ -1,13 +1,24 @@
-#' fourDNData
+#' @title fourDNData
+#' @name fourDNData
+#' @aliases fourDNHiCExperiment
 #'
-#' @description Fetches files from the 4DN data portal and cache them using 
+#' @description Fetches files from the 4DN data portal and caches them using 
 #'   the BiocFileCache system. 
-#' @param experimentSetAccession  
+#' @param experimentSetAccession Any 4DN-provided experimentSet Accession number
+#' (check https://data.4dnucleome.org/browse/) for a browser-based 
+#' explorer.
 #' @param type any of c('pairs', 'hic', 'mcool', 'boundaries', 
 #'   'insulation', 'compartments')
 #' @param .fetch_pairs Whether to also download the associated pairs file
 #' 
-#' @return Local path of the queried file cached with BiocFileCache.
+#' @return `fourDNData()` returns the local path of the queried file
+#' cached with BiocFileCache. `fourDNHiCExperiment()` returns a 
+#' `HiCExperiment` object with populated metadata and topologicalFeatures (
+#' if available). 
+#' @importFrom GenomicRanges width
+#' @importFrom GenomicRanges GRanges
+#' @importFrom IRanges reduce
+#' @importFrom S4Vectors metadata
 #' @export
 #' 
 #' @examples
@@ -15,35 +26,35 @@
 #' ## Importing individual 4DN files ##
 #' ####################################
 #' 
-#' head(fourDNDataFiles())
-#' mcf <- fourDNDataFiles(experimentSetAccession = '4DNESDP9ECMN', type = 'mcool')
+#' head(fourDNData())
+#' mcf <- fourDNData(experimentSetAccession = '4DNESDP9ECMN', type = 'mcool')
 #' mcf
 #' 
 #' ####################################
 #' ## Importing full 4DN experiments ##
 #' ####################################
 #' 
-#' id <- fourDNDataFiles() |>
+#' id <- fourDNData() |>
 #'   dplyr::filter(
-#'      Experiment.Type == 'in situ Hi-C', 
-#'      Biosource == 'GM12878', 
-#'      Publication == 'Sanborn AL et al. (2015)'
+#'      experimentType == 'in situ Hi-C', 
+#'      biosource == 'GM12878', 
+#'      publication == 'Sanborn AL et al. (2015)'
 #'   ) |> 
-#'   dplyr::arrange(Size..MB.) |> 
-#'   dplyr::pull(Experiment.Set.Accession) |> 
+#'   dplyr::arrange(size) |> 
+#'   dplyr::pull(experimentSetAccession) |> 
 #'   unique()
 #' id[1]
 #' x <- fourDNHiCExperiment(id[1])
 #' x
-#' topologicalFeatures(x)
-#' metadata(x)$`4DN_info`
+#' HiCExperiment::topologicalFeatures(x)
+#' S4Vectors::metadata(x)$`4DN_info`
 NULL 
 
 #' @export
 
-fourDNDataFiles <- function(experimentSetAccession = NULL, type = "mcool") {
+fourDNData <- function(experimentSetAccession = NULL, type = "mcool") {
     dat <- .parse4DNMetadata()
-    entry <- dat[dat$Experiment.Set.Accession == experimentSetAccession, ]
+    entry <- dat[dat$experimentSetAccession == experimentSetAccession, ]
     x <- .checkEntry(entry, dat, with_ID = !is.null(experimentSetAccession))
     if(!isTRUE(x)) return(x)
     res <- .get4DNData(experimentSetAccession, type)
@@ -55,12 +66,12 @@ fourDNDataFiles <- function(experimentSetAccession = NULL, type = "mcool") {
 fourDNHiCExperiment <- function(experimentSetAccession, .fetch_pairs = FALSE) {
     bfc <- fourDNDataCache()
     dat <- .parse4DNMetadata()
-    entry <- dat[dat$Experiment.Set.Accession == experimentSetAccession, ]
-    url_map <- entry[entry$File.Format == 'mcool', 'Open.Data.URL']
-    url_compartments <- entry[entry$File.Type == 'compartments', 'Open.Data.URL']
-    url_insulation <- entry[entry$File.Type == 'insulation score-diamond', 'Open.Data.URL']
-    url_borders <- entry[entry$File.Type == 'boundaries', 'Open.Data.URL']
-    url_pairs <- entry[entry$File.Format == 'pairs', 'Open.Data.URL']
+    entry <- dat[dat$experimentSetAccession == experimentSetAccession, ]
+    url_map <- entry[entry$fileType == 'mcool', 'URL']
+    url_compartments <- entry[entry$fileType == 'compartments', 'URL']
+    url_insulation <- entry[entry$fileType == 'insulation', 'URL']
+    url_borders <- entry[entry$fileType == 'boundaries', 'URL']
+    url_pairs <- entry[entry$fileType == 'pairs', 'URL']
     
     # - Fetch contact map, compartments, insulation and borders
     if (!length(url_map)) {
@@ -79,7 +90,7 @@ fourDNHiCExperiment <- function(experimentSetAccession, .fetch_pairs = FALSE) {
         else {
             message( "Fetching local Hi-C contact map from Bioc cache" )
         }
-        fileinfo <- as.list(entry[entry$File.Format == 'mcool',])
+        fileinfo <- as.list(entry[entry$fileType == 'mcool',])
     }
     if (!length(url_compartments)) {
         message("Compartments not found for the provided experimentSet accession.")
@@ -138,23 +149,33 @@ fourDNHiCExperiment <- function(experimentSetAccession, .fetch_pairs = FALSE) {
 
     # - Import all files in memory
     meta <- list(
-        `4DN_info` = fileinfo[c(2, 11, 12, 18, 19, 21, 22, 23, 24)]
+        `4DN_info` = fourDNData()[
+            fourDNData()$experimentSetAccession == experimentSetAccession,
+        ]
     )
     if (!length(url_compartments)) {
         topo_compartments <- GenomicRanges::GRanges()
         res <- HiCExperiment::lsCoolResolutions(bfcrpath(bfc, rids = rid_map))
         res <- res[length(res)]
     } else {
-        topo_compartments <- rtracklayer::import(bfcrpath(bfc, rids = rid_compartments))
-        topo_compartments <- topo_compartments[!is.na(topo_compartments$score)]
-        res <- max(GenomicRanges::width(topo_compartments))
-        meta$eigens <- topo_compartments
-        meta$eigens$eigen <- meta$eigens$score
-        A <- IRanges::reduce(topo_compartments[topo_compartments$score > 0])
-        A$compartment <- 'A'
-        B <- IRanges::reduce(topo_compartments[topo_compartments$score < 0])
-        B$compartment <- 'B'
-        topo_compartments <- sort(c(A, B))
+        if (requireNamespace("rtracklayer", quietly = TRUE)) {
+            topo_compartments <- rtracklayer::import(bfcrpath(bfc, rids = rid_compartments))
+            topo_compartments <- topo_compartments[!is.na(topo_compartments$score)]
+            res <- max(GenomicRanges::width(topo_compartments))
+            meta$eigens <- topo_compartments
+            meta$eigens$eigen <- meta$eigens$score
+            A <- IRanges::reduce(topo_compartments[topo_compartments$score > 0])
+            A$compartment <- 'A'
+            B <- IRanges::reduce(topo_compartments[topo_compartments$score < 0])
+            B$compartment <- 'B'
+            topo_compartments <- sort(c(A, B))
+        }
+        else {
+            warning('Install `rtracklayer` package (`BiocManager::install("rtracklayer")`)\nto import 4DN eigen vectors stored as bigwig tracks in R.')
+            topo_compartments <- GenomicRanges::GRanges()
+            res <- HiCExperiment::lsCoolResolutions(bfcrpath(bfc, rids = rid_map))
+            res <- res[length(res)]
+        }
     }
     if (length(url_insulation)) {
         meta$diamond_insulation <- rtracklayer::import(bfcrpath(bfc, rids = rid_insulation), as = 'Rle')
@@ -190,7 +211,7 @@ fourDNHiCExperiment <- function(experimentSetAccession, .fetch_pairs = FALSE) {
         else {
             message( "Fetching pairs file from Bioc cache" )
         }
-        pairsFile(x) <- rid_pairs
+        HiCExperiment::pairsFile(x) <- rid_pairs
     }
 
     return(x)

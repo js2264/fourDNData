@@ -5,22 +5,21 @@
 #' @description Managing 4DN data downloads via the integrated
 #' `BiocFileCache` system.
 #'
-#' @param ... For `fourDNDataCache`, arguments passed to `.setFourDNDataCache`
-#'
-#' @examples
-#' getOption("fourDNDataCache")
-#' fourDNDataCache()
+#' @param ... Arguments passed to internal `.setFourDNDataCache` function
 #'
 #' @import BiocFileCache
 #' @importFrom tools R_user_dir
-#' @export
+#' @export 
+#' @examples
+#' bfc <- fourDNDataCache()
+#' bfc
+#' BiocFileCache::bfcinfo(bfc)
+#'
 
 fourDNDataCache <- function(...) {
     cache <- getOption("fourDNDataCache", .setFourDNDataCache(..., verbose = FALSE))
     BiocFileCache::BiocFileCache(cache)
 }
-
-#' @rdname fourDNDataCache
 
 .setFourDNDataCache <- function(
     directory = tools::R_user_dir("fourDNData", "cache"),
@@ -50,27 +49,19 @@ fourDNDataCache <- function(...) {
     invisible(directory)
 }
 
-#' @rdname fourDNDataCache
-
 .get4DNData <- function(expSetAccession, type = 'mcool', verbose = FALSE) {
     dat <- .parse4DNMetadata()
-    subdat <- dat[dat$Experiment.Set.Accession == expSetAccession, ]
-    fileinfo <- NULL
-    if (type %in% c('boundaries', 'insulation', 'compartments')) {
-        fileinfo <- as.list(subdat[grepl(type, subdat$File.Type), ])
-    }
-    else if (type %in% c('pairs', 'hic', 'mcool')) {
-        fileinfo <- as.list(subdat[which(subdat$File.Format == type), ])
-    }
-    if (is.null(fileinfo)) stop("No matching file type.")
+    subdat <- dat[dat$experimentSetAccession == expSetAccession, ]
+    if (nrow(subdat[grepl(type, subdat$fileType), ]) == 0) stop("No matching file type.")
+    fileinfo <- as.list(subdat[grepl(type, subdat$fileType), ])
     bfc <- fourDNDataCache()
-    rid <- bfcquery(bfc, query = basename(fileinfo$Open.Data.URL))$rid
+    rid <- bfcquery(bfc, query = basename(fileinfo$URL))$rid
     if (!length(rid)) {
         if( verbose ) message( "Fetching Hi-C data from 4DN" )
         bfcentry <- bfcadd( 
             bfc, 
-            rname = basename(fileinfo$Open.Data.URL), 
-            fpath = fileinfo$Open.Data.URL 
+            rname = basename(fileinfo$URL), 
+            fpath = fileinfo$URL 
         )
         rid <- names(bfcentry)
     }

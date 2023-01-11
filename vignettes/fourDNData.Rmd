@@ -23,43 +23,48 @@ suppressPackageStartupMessages({
 ## Access to 4DN data
 
 fourDNData (read *4DN-Data*) is a data package giving programmatic access 
-to Hi-C contact matrices uniformly processed by the 
-[4DN consortium](https://www.4dnucleome.org/). The matrices are available 
-in the multi-resolution `.mcool` format, using the 
-`fourDNData(ID = ...)` function. 
+to Hi-C contact files uniformly processed by the 
+[4DN consortium](https://www.4dnucleome.org/). The `fourDNData()` function 
+provides a gateway to 4DN-hosted Hi-C files, including contact matrices 
+(in `.hic` or `.mcool`) and other Hi-C derived files such as annotated 
+compartments, domains, insulation scores, or pairs files.
 
 ```{r}
 library(fourDNData)
-```
-
-The `fourDNData()` function provides a gateway to ExperimentHub-hosted 4DN 
-`.mcool` files.
-
-```{r}
-data(fourDNDataFiles)
-head(fourDNDataFiles)
-cool_file <- fourDNData(id = '4DNFIJTOIGOI')
+head(fourDNData())
+cool_file <- fourDNData('4DNESDP9ECMN')
 cool_file
 ```
 
 ## HiCExperiment and fourDNData
 
-`HiCExperiment` package can be used to import `.mcool` files provided by 
+The `HiCExperiment` package can be used to import `.mcool` files provided by 
 `fourDNData`. Refer to `HiCExperiment` package documentation for further 
 information. 
 
 ```{r}
 library(HiCExperiment)
-ID <- '4DNFIJTOIGOI'
-coolf <- CoolFile(
-    path = fourDNData(id = ID), 
-    metadata = as.list(fourDNDataFiles[fourDNDataFiles$ID == ID,])
+ID <- '4DNESDP9ECMN'
+cf <- CoolFile(
+    path = fourDNData(ID), 
+    metadata = as.list(fourDNData()[fourDNData()$experimentSetAccession == ID,])
 )
-x <- import(coolf, resolution = 250000, focus = 'chr5:10000000-50000000')
+x <- import(cf, resolution = 250000, focus = 'chr5:10000000-50000000')
 x
 interactions(x)
 as(x, 'ContactMatrix')
 ```
+
+Rather than importing multiple files corresponding to a single experimentSet 
+accession ID one by one, one can import all the available files associated with 
+a experimentSet accession ID into a `HiCExperiment` object by using the 
+`fourDNHiCExperiment()` function.
+
+```{r}
+library(HiCExperiment)
+x <- fourDNHiCExperiment('4DNESDP9ECMN')
+```
+
 
 ## Session info
 

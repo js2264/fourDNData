@@ -1,6 +1,6 @@
 Package: fourDNData
 Title: 4DN data package
-Version: 1.1.6
+Version: 0.98.0
 Date: 2022-08-16
 Authors@R: 
     person(given = "Jacques",
@@ -17,11 +17,16 @@ License: MIT + file LICENSE
 URL: https://github.com/js2264/fourDNData
 BugReports: https://github.com/js2264/fourDNData/issues
 Depends:
-    R (>= 2.10)
+    R (>= 4.2)
 Imports: 
-    BiocFileCache
-Suggests:
+    BiocFileCache, 
     HiCExperiment, 
+    GenomicRanges, 
+    IRanges, 
+    S4Vectors
+Suggests:
+    rtracklayer, 
+    dplyr, 
     testthat, 
     methods,
     BiocStyle,

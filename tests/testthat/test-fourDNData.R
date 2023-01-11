@@ -1,8 +1,10 @@
-context("test-fourDNDataFiles")
+context("test-fourDNData")
 
-test_that("fourDNDataFiles function works", {
-    expect_equal({
-        s <- fourDNDataFiles(id = "4DNFIJTOIGOI")
-        isTRUE(nzchar(s, keepNA = TRUE))
-    }, TRUE)
+test_that("fourDNData function works", {
+    s <- fourDNData(experimentSetAccession = "4DNESDP9ECMN")
+    s2 <- fourDNHiCExperiment("4DNES4JNDDVX")
+    expect_no_warning(fourDNData())
+    expect_warning(fourDNData('sdvsd'))
+    expect_true(isTRUE(nzchar(s, keepNA = TRUE)))
+    expect_s4_class(s2, 'HiCExperiment')
 })

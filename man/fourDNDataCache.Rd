@@ -2,65 +2,20 @@
 % Please edit documentation in R/cache.R
 \name{fourDNDataCache}
 \alias{fourDNDataCache}
-\alias{.setFourDNDataCache}
-\alias{.get4DNData}
-\alias{.addFourDNData}
 \title{Manage cache / download files from the 4DN data portal}
 \usage{
 fourDNDataCache(...)
-
-.setFourDNDataCache(
-  directory = tools::R_user_dir("fourDNData", "cache"),
-  verbose = TRUE,
-  ask = interactive()
-)
-
-.get4DNData(expSetAccession, type = "FULL", verbose = FALSE)
-
-.addFourDNData(bfc, fileinfo)
 }
 \arguments{
-\item{...}{For \code{fourDNDataCache}, arguments passed to \code{setCache}}
-
-\item{directory}{character(1) The file location where the cache is located.
-Once set, future downloads will go to this folder. See \code{setCache} section
-for details.}
-
-\item{verbose}{Whether to print descriptive messages}
-
-\item{ask}{logical(1) (default TRUE when \code{interactive()}) Confirm the file
-location of the cache directory}
-
-\item{type}{any of c('FULL', 'pairs', 'hic', 'mcool', 'boundaries', 'insulation', 'compartments')}
-
-\item{accession}{character(1) A single string indicating the accession number
-of the study}
-}
-\value{
-The directory / option of the cache location
+\item{...}{Arguments passed to internal \code{.setFourDNDataCache} function}
 }
 \description{
-Managing data downloads is important to save disk space and
-re-downloading data files. This can be done effortlessly via the integrated
+Managing 4DN data downloads via the integrated
 \code{BiocFileCache} system.
 }
-\section{fourDNDataCache}{
-
-Get the directory location of the cache. It will prompt the user to create
-a cache if not already created. A specific directory can be used via
-\code{setCache}.
-}
-
-\section{setCache}{
-
-Specify the directory location of the data cache. By default, it will
-go into the user's home and package name directory as given by
-\link[tools:userdir]{R_user_dir} (default: varies by system e.g., for Linux:
-'$HOME/.cache/R/fourDNData').
-}
-
 \examples{
-getOption("fourDNDataCache")
-fourDNDataCache()
+bfc <- fourDNDataCache()
+bfc
+BiocFileCache::bfcinfo(bfc)
 
 }
