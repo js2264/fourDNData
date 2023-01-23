@@ -46,7 +46,7 @@ information.
 library(HiCExperiment)
 ID <- '4DNESDP9ECMN'
 cf <- CoolFile(
-    path = fourDNData(ID), 
+    path = fourDNData(ID, type = 'mcool'), 
     metadata = as.list(fourDNData()[fourDNData()$experimentSetAccession == ID,])
 )
 x <- import(cf, resolution = 250000, focus = 'chr5:10000000-50000000')
@@ -64,7 +64,6 @@ a experimentSet accession ID into a `HiCExperiment` object by using the
 library(HiCExperiment)
 x <- fourDNHiCExperiment('4DNESDP9ECMN')
 ```
-
 
 ## Session info
 

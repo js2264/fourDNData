@@ -52,9 +52,11 @@ NULL
 
 #' @export
 
-fourDNData <- function(experimentSetAccession = NULL, type = "mcool") {
+fourDNData <- function(experimentSetAccession = NULL, type = NULL) {
     dat <- .parse4DNMetadata()
+    if (is.null(experimentSetAccession)) return(dat)
     entry <- dat[dat$experimentSetAccession == experimentSetAccession, ]
+    if (is.null(type)) return(entry)
     x <- .checkEntry(entry, dat, with_ID = !is.null(experimentSetAccession))
     if(!isTRUE(x)) return(x)
     res <- .get4DNData(experimentSetAccession, type)
