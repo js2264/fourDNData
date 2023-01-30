@@ -9,6 +9,9 @@ fourDNDataCache(...)
 \arguments{
 \item{...}{Arguments passed to internal \code{.setFourDNDataCache} function}
 }
+\value{
+BiocFileCache object
+}
 \description{
 Managing 4DN data downloads via the integrated
 \code{BiocFileCache} system.
@@ -17,5 +20,4 @@ Managing 4DN data downloads via the integrated
 bfc <- fourDNDataCache()
 bfc
 BiocFileCache::bfcinfo(bfc)
-
 }

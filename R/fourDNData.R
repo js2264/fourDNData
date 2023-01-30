@@ -54,11 +54,19 @@ NULL
 
 fourDNData <- function(experimentSetAccession = NULL, type = NULL) {
     dat <- .parse4DNMetadata()
+    ## -- If no experimentSetAccession: return all metadata
     if (is.null(experimentSetAccession)) return(dat)
+    ## -- If not matching experimentSetAccession: return warning
     entry <- dat[dat$experimentSetAccession == experimentSetAccession, ]
+    if (nrow(entry) == 0) {
+        stop('Unknown `experimentSetAccession`.\n  ', 
+            'Please check which experimentSetAccession IDs are available \n  ', 
+            'from 4DN consortium in the data frame returned by fourDNData().'
+        )
+    }
+    ## -- If no type: return all matching entries
     if (is.null(type)) return(entry)
-    x <- .checkEntry(entry, dat, with_ID = !is.null(experimentSetAccession))
-    if(!isTRUE(x)) return(x)
+    ## -- If type: return only matching entry
     res <- .get4DNData(experimentSetAccession, type)
     return(res[[1]])
 }

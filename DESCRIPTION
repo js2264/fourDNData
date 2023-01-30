@@ -23,7 +23,9 @@ Imports:
     HiCExperiment, 
     GenomicRanges, 
     IRanges, 
-    S4Vectors
+    S4Vectors, 
+    utils, 
+    tools
 Suggests:
     rtracklayer, 
     dplyr, 

@@ -14,7 +14,11 @@
 #' bfc <- fourDNDataCache()
 #' bfc
 #' BiocFileCache::bfcinfo(bfc)
-#'
+NULL
+
+#' @return BiocFileCache object
+#' @rdname fourDNDataCache
+#' @export
 
 fourDNDataCache <- function(...) {
     cache <- getOption("fourDNDataCache", .setFourDNDataCache(..., verbose = FALSE))
