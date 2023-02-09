@@ -11,8 +11,7 @@ Description:
     fourDNData is a data package giving programmatic access to Hi-C 
     contact matrices uniformly processed by the 
     [4DN consortium](https://www.4dnucleome.org/). The matrices are available 
-    in the multi-resolution `.mcool` format. All .mcool files have been 
-    downloaded from the 4DN data portal on Dec. 1, 2022. 
+    in the multi-resolution `.mcool` format.
 License: MIT + file LICENSE
 URL: https://github.com/js2264/fourDNData
 BugReports: https://github.com/js2264/fourDNData/issues
