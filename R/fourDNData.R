@@ -165,7 +165,7 @@ fourDNHiCExperiment <- function(experimentSetAccession, .fetch_pairs = FALSE) {
     )
     if (!length(url_compartments)) {
         topo_compartments <- GenomicRanges::GRanges()
-        res <- HiCExperiment::lsCoolResolutions(bfcrpath(bfc, rids = rid_map))
+        res <- HiCExperiment::availableResolutions(bfcrpath(bfc, rids = rid_map))
         res <- res[length(res)]
     } else {
         if (requireNamespace("rtracklayer", quietly = TRUE)) {
@@ -183,7 +183,7 @@ fourDNHiCExperiment <- function(experimentSetAccession, .fetch_pairs = FALSE) {
         else {
             warning('Install `rtracklayer` package (`BiocManager::install("rtracklayer")`)\nto import 4DN eigen vectors stored as bigwig tracks in R.')
             topo_compartments <- GenomicRanges::GRanges()
-            res <- HiCExperiment::lsCoolResolutions(bfcrpath(bfc, rids = rid_map))
+            res <- HiCExperiment::availableResolutions(bfcrpath(bfc, rids = rid_map))
             res <- res[length(res)]
         }
     }
