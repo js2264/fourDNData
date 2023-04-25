@@ -1,6 +1,6 @@
 Package: fourDNData
 Title: 4DN data package
-Version: 0.99.3
+Version: 1.0.0
 Date: 2022-08-16
 Authors@R: 
     person(given = "Jacques",
