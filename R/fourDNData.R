@@ -47,7 +47,7 @@
 #' x <- fourDNHiCExperiment(id[1])
 #' x
 #' HiCExperiment::topologicalFeatures(x)
-#' S4Vectors::metadata(x)$`4DN_info`
+#' metadata(x)$`4DN_info`
 NULL 
 
 #' @export
